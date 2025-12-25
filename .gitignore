@@ -75,3 +75,5 @@ logback.xml
 *.groovy
 *.proto
 *.sql
+!gradle/wrapper/
+

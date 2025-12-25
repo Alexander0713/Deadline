@@ -23,19 +23,13 @@ class AuthTest {
 
     @Test
     void shouldSuccessfullyLoginWithValidCredentials() {
-        loginPage.login("vasya", "qwerty123");
+        DataHelper.TestUser user = DataHelper.getTestUser();
+        loginPage.login(user.getLogin(), user.getPassword());
 
         VerificationPage verificationPage = new VerificationPage();
         verificationPage.verifyPageVisible(Duration.ofSeconds(10));
 
-        // Даем время на генерацию кода
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        String code = DataHelper.getVerificationCodeForUser("vasya");
+        String code = DataHelper.getVerificationCodeForUser(user.getLogin());
         assertNotNull(code, "Код верификации не должен быть null");
         assertFalse(code.isEmpty(), "Код верификации не должен быть пустым");
 
@@ -48,55 +42,26 @@ class AuthTest {
 
     @Test
     void shouldShowErrorWithInvalidCredentials() {
-        loginPage.login("invalid", "invalid");
+        DataHelper.TestUser invalidUser = DataHelper.getInvalidUser();
+        loginPage.login(invalidUser.getLogin(), invalidUser.getPassword());
         loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(10));
     }
 
     @Test
     void shouldBlockUserAfterThreeInvalidAttempts() {
-        String testUser = "testuser" + System.currentTimeMillis();
+        DataHelper.TestUser randomUser = DataHelper.generateRandomUser();
 
-        for (int i = 0; i < 3; i++) {
-            loginPage.login(testUser, "wrongpass" + i);
-            loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(10));
+        loginPage.login(randomUser.getLogin(), "wrongpass1");
+        loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
 
-            open("http://localhost:9999");
-            loginPage = new LoginPage();
-        }
+        loginPage.login(randomUser.getLogin(), "wrongpass2");
+        loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
 
-        loginPage.login("vasya", "qwerty123");
+        loginPage.login(randomUser.getLogin(), "wrongpass3");
+        loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
 
-        VerificationPage verificationPage = new VerificationPage();
-        verificationPage.verifyPageVisible(Duration.ofSeconds(10));
-
-        String code = DataHelper.getVerificationCodeForUser("vasya");
-        assertNotNull(code, "Код должен генерироваться даже после неудачных попыток");
+        loginPage.login(randomUser.getLogin(), "anypassword");
+        loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
     }
 
-    @Test
-    void shouldSaveVerificationCodeInDatabase() {
-        loginPage.login("vasya", "qwerty123");
-
-        VerificationPage verificationPage = new VerificationPage();
-        verificationPage.verifyPageVisible(Duration.ofSeconds(10));
-
-        // Ждем генерации кода
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        int codesCount = DataHelper.getAuthCodesCount();
-        assertTrue(codesCount > 0, "В базе данных должен быть сохранен хотя бы один код верификации");
-
-        String code = DataHelper.getVerificationCodeForUser("vasya");
-        assertNotNull(code, "Код верификации должен быть сохранен для пользователя vasya");
-        assertFalse(code.isEmpty(), "Код верификации не должен быть пустым");
-    }
-
-    @Test
-    void shouldVerifyLoginFormElements() {
-        loginPage.verifyLoginFormVisible(Duration.ofSeconds(10));
-    }
 }

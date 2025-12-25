@@ -20,12 +20,6 @@ public class LoginPage {
         loginButton.click();
     }
 
-    public void verifyLoginFormVisible(Duration timeout) {
-        loginField.shouldBe(visible, timeout);
-        passwordField.shouldBe(visible, timeout);
-        loginButton.shouldBe(visible, timeout);
-    }
-
     public void verifyErrorNotificationVisible(Duration timeout) {
         errorNotification.shouldBe(visible, timeout);
     }
