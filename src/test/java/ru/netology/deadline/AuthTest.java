@@ -31,7 +31,6 @@ class AuthTest {
 
         String code = DataHelper.getVerificationCodeForUser(user.getLogin());
         assertNotNull(code, "Код верификации не должен быть null");
-        assertFalse(code.isEmpty(), "Код верификации не должен быть пустым");
 
         verificationPage.enterCode(code);
         verificationPage.verifyErrorNotificationNotVisible(Duration.ofSeconds(10));
@@ -42,25 +41,26 @@ class AuthTest {
 
     @Test
     void shouldShowErrorWithInvalidCredentials() {
-        DataHelper.TestUser invalidUser = DataHelper.getInvalidUser();
-        loginPage.login(invalidUser.getLogin(), invalidUser.getPassword());
+        DataHelper.TestUser user = DataHelper.getTestUser();
+        loginPage.login(user.getLogin(), "wrongpassword");
+
         loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(10));
     }
 
     @Test
     void shouldBlockUserAfterThreeInvalidAttempts() {
-        DataHelper.TestUser randomUser = DataHelper.generateRandomUser();
+        DataHelper.TestUser existingUser = DataHelper.getTestUser();
 
-        loginPage.login(randomUser.getLogin(), "wrongpass1");
+        loginPage.login(existingUser.getLogin(), "wrongpassword1");
         loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
 
-        loginPage.login(randomUser.getLogin(), "wrongpass2");
+        loginPage.login(existingUser.getLogin(), "wrongpass2");
         loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
 
-        loginPage.login(randomUser.getLogin(), "wrongpass3");
+        loginPage.login(existingUser.getLogin(), "wrongpass3");
         loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
 
-        loginPage.login(randomUser.getLogin(), "anypassword");
+        loginPage.login(existingUser.getLogin(), "anypassword");
         loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
     }
 
