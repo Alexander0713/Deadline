@@ -28,8 +28,4 @@ public class VerificationPage {
     public void verifyErrorNotificationNotVisible(Duration timeout) {
         errorNotification.shouldNotBe(visible, timeout);
     }
-
-    public void verifyErrorNotificationVisible(Duration timeout) {
-        errorNotificationText.shouldHave(exactText("Ошибка! Неверно указан логин или пароль"), timeout);
-    }
 }

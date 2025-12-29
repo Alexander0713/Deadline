@@ -34,13 +34,6 @@ public class DataHelper {
         return new TestUser(login, password);
     }
 
-    public static TestUser generateInvalidUser() {
-        String login = faker.name().username().toLowerCase().replaceAll("[^a-z0-9]", "");
-        String password = faker.internet().password(8, 12, true, true, true);
-        return new TestUser(login, password);
-    }
-
-
     public static String getVerificationCodeForUser(String login) {
         String sql = "SELECT code FROM auth_codes ac " +
                 "JOIN users u ON ac.user_id = u.id " +
