@@ -61,7 +61,7 @@ class AuthTest {
         loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
 
         loginPage.login(existingUser.getLogin(), "anypassword");
-        loginPage.verifyErrorNotificationVisible(Duration.ofSeconds(5));
+        loginPage.verifyBlockedUserMessageVisible(Duration.ofSeconds(5));
     }
 
 }
